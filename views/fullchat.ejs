@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+   <script src="https://malsup.github.io/jquery.form.js"></script> 
+   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
+   <link rel="stylesheet" href="styles/partials/fullchat.css">   
+   <link rel="stylesheet" href="styles/tailwind.css">
+   <title>Chat Playground Test Thing Fullview</title>
+</head>
+<style>
+.box {
+   margin: 1.5rem 2rem;
+   padding: 3rem 6rem;
+   text-align: center;
+   border-radius: .75rem;
+   box-shadow: 0 .1rem .3rem #eee;
+   font-family: "Comic Sans MS", serif;
+   border-left: solid .8rem #14e86c;
+}
+</style>
+<body>
+<div class="chatbox">
+   <!-- Menubar -->
+   <div class="bg-gray-100 sticky top-0 left-0 right-0 h-[10vh] w-[100vw] z-10 dark:bg-gray-800">
+      <img class="chat-close-img" src="images/Chat/speech-bubble.png" title="Chat Playground Test Thing">
+      <span class="material-icons-round chat-menu-icon" onclick="window.location = '/start-video'">videocam</span>
+      <span class="material-icons-round chat-menu-icon">settings</span>
+      <span class="material-icons-round chat-menu-icon">group</span>
+      <span class="material-icons-round chat-menu-icon" onclick="toggleChatMenu()">loop</span>
+   </div>
+
+   <!-- Template -->
+   <div class="template-parent hidden">
+      <div class="message message-right-template">
+         <img title="" class="image-right">
+         <div class="shape-right"></div>
+         <div class="message-bubble">
+            <span class="chat-text-template"></span>
+            <br>
+            <span class="time"></span>
+            <div class="chat-edit-message">
+               <img class="chat-edit-img-template absolute bottom-[4vh] right-[4vh] h-[3vh]" style="transition: .15s" src="images/Chat/pencil.png" onclick="toggleEdit(this)">
+               <div class="edit-msg">
+                  <form class="change-msg-template" action="edit-message" method="POST">
+                     <textarea class="edit-message-input" type="text" name="newMessage" placeholder="New text..." rows="3"></textarea><br>
+                     <input style="display: none;" type="text" name="msgId" value=""><br>
+                     <button class="save-msg" type="text">Save</button>
+                  </form>
+                  <form class="remove-msg-template" action="delete-message" method="POST">
+                     <input class="msgIdDel" style="display: none;" type="text" name="msgId" value=""><br>
+                     <button class="delete-msg" type="text">
+                        <span class="material-icons-round">delete_outline</span>
+                     </button>
+                  </form>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+   <!-- Messages -->
+   <div class="messages dark:bg-gray-700">
+      <%foundItems.forEach(function(item) {%>
+         <% if (item.user == user.name) { %>
+            <!-- This user's messages -->
+            <div class="message message-right" data-id="<%=item._id%>">
+               <div class="message-bubble">
+                  <div class="msg-cols">
+                     <div>
+                        <img class="image-right" src=<%= `images/Avatars/${item.avatar}.png` %>>
+                     </div>
+                     <div class="ml-6">
+                        <span class="chat-text"><%=item.input%></span>
+                        <br>
+                        <span class="time"><%=`${item.datePosted.getHours()}:${item.datePosted.getMinutes()} on ${item.datePosted.getDate()}/${item.datePosted.getMonth()+1}/${item.datePosted.getFullYear()}`%></span>
+                     </div>   
+                  </div>
+                  <div class="chat-edit-message">
+                     <img class="chat-edit-img absolute bottom-[4vh] right-[4vh] h-[3vh]" style="transition: .15s" src="images/Chat/pencil.png" onclick="toggleEdit(this)">
+                     <div class="edit-msg">
+                        <form class="change-msg" action="edit-message" method="POST">
+                           <textarea class="edit-message-input" type="text" name="newMessage" placeholder="New text..." rows="3"></textarea><br>
+                           <input style="display: none;" type="text" name="msgId" value="<%=item._id%>"><br>
+                           <button class="save-msg" type="text">Save</button>
+                        </form>
+                        <form class="remove-msg" action="delete-message" method="POST">
+                           <input style="display: none;" type="text" name="msgId" value="<%=item._id%>"><br>
+                           <button class="delete-msg" type="text">
+                              <span class="material-icons-round">delete_outline</span>
+                           </button>
+                        </form>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <!-- Here are the messages by other people -->
+            <%} else { %>
+               <div class="message">
+                  <div class="message-bubble">
+                     <div class="msg-cols">
+                        <div>
+                           <%users.forEach(function(user) {%>
+                              <% if (user.name == item.user) { %>
+                                 <img  onmouseover="info(this)" data-info="<%=item.user%>" class="image" src=<%= `images/Avatars/${user.avatar}.png` %>>
+                              <% } %>
+                           <% }); %>
+                        </div>
+                        <div class="ml-6">
+                           <%=item.input%>
+                           <br>
+                           <% if (item.datePosted) { %>
+                              <span class="time"><%=`${item.datePosted.getHours()}:${item.datePosted.getMinutes()} on ${item.datePosted.getDate()}/${item.datePosted.getMonth()+1}/${item.datePosted.getFullYear()}`%></span>
+                           <% } %>   
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            <% } %>
+      <%});%>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0" />
+      <form action="chat-message" method="POST" class="fixed bottom-0" id="post-chat-msg">
+         <input style="display: none;" class="chat-posted-time" type="date" name="time"><br>
+         <input class="bg-gray-100 w-[100vw] p-[3vh] border-0 box-border text-2xl focus:outline-none dark:text-gray-50 dark:bg-gray-800" id="newMessageTextbox" type="text" name="message" placeholder="Message..." required><br>
+         <button class="absolute bottom-4 right-6 h-10" type="submit"><span class="material-symbols-rounded text-gray-50" style="font-size: 2.5rem">send</span></button>
+      </form>
+   </div>
+
+   <!-- Switch chat -->
+   <div class="menu-switchchat">
+      <%chats.forEach(function(obj) {%>
+         <% if (user.chats.includes(obj.code)) { %>
+            <p><%= obj.code %> : <%= obj.name %></p>
+         <% } %>
+      <%});%>
+   </div>
+
+</div>
+<script src="scripts/fullchat.js"></script>
+
+</body>
+</html>
