@@ -35,27 +35,16 @@
 
 .chatbox {
    position: fixed;
-   bottom: 0;
-   right: 0;
    height: 100vh;
-   width: 100vw;
-   background-color: var(--bg-color);
    font-size: 4vh;
    font-family: "Nunito";
    color: var(--txt-color);
-   box-shadow: 0 0 .3vh #00000020;
    overflow: auto;
 }
 
 .chat-menu-icon {
    float: right;
-   margin: 2vh 1vh;
-   /* background: linear-gradient(to bottom right, #FFF45A, #FF9C5A); */
-   /* background: linear-gradient(to bottom right, #5AFFF3, #5AC7FF); */
-   /* background: linear-gradient(to bottom right, #5aff86, #5ae9ff); */
-   /* background: linear-gradient(to bottom right, #94ff5a, #68ff5a); */
-   /* background: linear-gradient(to bottom right, #a25aff, #e15aff); */
-   /* background: linear-gradient(to bottom right, #ffa45a, #ff705a); */
+   margin: 1vh;
    background: linear-gradient(to bottom right, #ffc963, #fa8d46);
    -webkit-background-clip: text;
    -webkit-text-fill-color:transparent;
@@ -73,25 +62,14 @@
 
 .menu-switchchat {
    position: absolute;
-   top: 0;
+   top: 8vh;
    right: 100vw;
-   height: 80vh;
+   height: 92vh;
    width: 100vw;
    padding: 10vh 2vh;
    background-color: #fefefe;
    overflow: auto;
    transition: .2s;
-}
-
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-// Menubar
-//
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-/* Toggle Image */
-.chat-close-img {
-   height: 8vh;
 }
  
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,50 +79,24 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 .messages {
-   margin: 0 0 10vh 0;
+   margin: 0 0 12vh 0;
 }
 
-.message {
+.message, .message-right {
    position: relative;
-   padding: 2vh;
-   margin: .05rem;
+   margin: 2vh;
    max-width: 100vw;
-   background-color: #eee;
-}
-
-.message .image, .message .image-right {
-   height: 4rem;
-   width: 4rem;
-   margin: .5rem;
-   border-radius: 100%;
-   background-color: var(--img-bg);
-}
-
-.message .message-bubble {
    font-size: 2.5vh;
-   background-color: var(--msg-othr-bg);
-   border-radius: 2vh;
+   border-radius: .75rem;
    padding: 1.5vh;
-   text-align: left;
 }
+
+.message { background-color: var(--msg-othr-bg); }
+.message-right { background-color: var(--msg-your-bg);}
 
 .msg-cols {
    display: grid;
    grid-template-columns: 5rem auto;
-}
-
-.message-right .message-bubble {
-   font-size: 2.5vh;
-   background-color: var(--msg-your-bg);
-   border-radius: 2vh;
-   padding: 1.5vh;
-   text-align: left;
-}
-  
-.chat-title {
-   text-align: center;
-   padding-bottom: .5vh;
-   margin: .5vh;
 }
 
 .time {
@@ -152,28 +104,28 @@
    color: #6A6C6E;
 }
 
-/*
-D7FFEF
-BAFFE4
-*/
-
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 // Edit Messages
 //
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+.chat-edit-img {
+   padding: .5rem;
+   background-color: #ffffff20;
+   box-shadow: 0 0 .2rem #ffffff88;
+   border-radius: .5rem;
+   backdrop-filter: blur(.2rem);
+}
+
 .chat-edit-img:hover {
    transform: scale(1.25) translate(0, -.5vh);
 }
 
 .chat-edit-message {
-   width: 100%;
    min-height: 0;
    max-height: 0;
    overflow: hidden;
-   background-color: #fcfcfc;
-   border-radius: 1vh;
    transition: .2s;
 }
 
@@ -187,7 +139,6 @@ BAFFE4
    width: 100%;
    padding: 1.5vh;
    font-size: 2.5vh;
-   background-color: #f6f6f6;
    border: none;
    border-radius: 1vh;
    font-family: "Nunito", sans-serif;
@@ -201,7 +152,7 @@ BAFFE4
 .edit-msg {
    width: 100%;
    display: grid;
-   grid-template-columns: auto auto;
+   grid-template-columns: auto 12rem;
 }
 
 .edit-msg button {
@@ -211,12 +162,9 @@ BAFFE4
    transition: .2s;
 }
 
-.edit-msg button:hover { background-color: #ddd; }
-
 .edit-msg .save-msg {
    width: 100%;
    font-size: 2.5vh;
-   background-color: #f6f6f6;
 }
 
 .edit-msg .delete-msg span {
@@ -225,12 +173,10 @@ BAFFE4
 }
 
 .edit-msg .delete-msg {
-   margin: -3vh 0 0 2vh;
+   width: 10rem;
+   margin: -3vh 0 0 1rem;
    height: calc(100% - 1vh);
-   background-color: #e25050;
 }
-
-.edit-msg .delete-msg:hover { background-color: #c22d2d; }
 
 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
