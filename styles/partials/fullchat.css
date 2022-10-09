@@ -89,6 +89,7 @@
    font-size: 2.5vh;
    border-radius: .75rem;
    padding: 1.5vh;
+   box-shadow: 0 0 .2rem #f0f0f0;
 }
 
 .message { background-color: var(--msg-othr-bg); }

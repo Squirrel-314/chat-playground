@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <title>Socket.IO chat</title>
+    <style>
+      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+      #name, #message { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+      #name:focus, #message:focus { outline: none; }
+      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages > li { padding: 0.5rem 1rem; }
+      #messages > li:nth-child(odd) { background: #efefef; }
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form id="form">
+      <input id="name" name="name" placeholder="name">
+      <input id="message" name="msg" placeholder="message">
+      <button id="send" value="submit">Send</button>
+    </form>
+
+
+   <script src="/socket.io/socket.io.js"></script>
+   <script>
+      var socket = io();
+    
+      var messages = document.getElementById('messages');
+      var form = document.getElementById('form');
+    
+      form.addEventListener("submit", function(e) {
+         e.preventDefault();
+         if (document.querySelector("#form").msg.value) {
+            socket.emit("chat message", { name: document.querySelector("#form").name.value, msg: document.querySelector("#form").msg.value, on: new Date() });
+            document.querySelector("#form").name.value = "";
+            document.querySelector("#form").msg.value = "";
+         }
+      });
+    
+      socket.on('chat message', function(msg) {
+         var item = document.createElement('li');
+         item.innerHTML = `${msg.msg} <br> Posted by <i>${msg.name}</i> ${mdy(msg.on)} at ${thetime(msg.on)} ${dateDiff(msg.on)}`;
+         messages.appendChild(item);
+         window.scrollTo(0, document.body.scrollHeight);
+      });
+
+
+      function mdy(dateString) {
+         let dateObj = new Date(dateString);
+         let currentDate = new Date().getUTCDate();
+         if (dateObj.getUTCDate() != currentDate) { return `on ${dateObj.getUTCDate()}/${dateObj.getUTCMonth() + 1}/${dateObj.getUTCFullYear()}`; }
+         else { return ""; }
+      }
+
+      function thetime(dateString) {
+         let dateObj = new Date(dateString);
+         let hours, mins;
+         if (dateObj.getHours().length < 2) { hours = `0${dateObj.getHours()}` }
+         else { hours = `${dateObj.getHours()}` }
+         if (dateObj.getMinutes().length < 2) { mins = `0${dateObj.getMinutes()}` }
+         else { mins = `${dateObj.getMinutes()}` }
+         return `${hours}:${mins}`;
+      }
+
+      function dateDiff(dateString) {
+         var then = new Date(dateString);
+         var now = new Date();
+         var diffMs = (now - then);
+         var diffDays = Math.floor(diffMs / 86400000); // days
+         var diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
+         var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+
+         if (diffDays == 0) {
+            if (diffHrs == 0) { return `(${diffMins} minutes ago)`; }
+            else { return `(${diffHrs} hours and ${diffMins} minutes ago)`; }
+         }
+         else if (diffDays < 31) { return `(${diffDays} days, ${diffHrs} hours, and ${diffMins} minutes ago)`; }
+         else { return "(over 30 days ago)"; }
+      }
+
+
+
+
+
+      // socket.on("chat message", addMessages);
+
+      // function addMessages(message) {
+      //    $("#messages").append(`
+      //       <h4> ${message.name} </h4>
+      //       <p>  ${message.message} </p>`)
+      // }
+
+
+      // $("#form").submit(function(event) {
+      //    event.preventDefault();
+      //    sendMessage(this);
+      //    // socket.emit('chat message', message.value);
+      // });
+
+      // document.querySelector("#form").addEventListener('submit', function(e) {
+      //    e.preventDefault();
+      //    console.log(document.querySelector("#name").value, document.querySelector("#message").value)
+      // });
+
+
+      // $(() => {
+      //    $("#send").click(() => {
+      //    })
+      //    getMessages();
+      // })
+
+
+      // getMessages();
+
+      // function getMessages() {
+      //    $.get(`${window.location.origin}/messages`, (data) => {
+      //       console.log(data)
+      //       data.forEach(addMessages);
+      //    })
+      // }
+       
+      // function sendMessage(ths) {
+      //    console.log(ths, ths.message.value);
+      //    $.post("/messagesss", {
+      //       name: ths.name.value,
+      //       message: ths.message.value
+      //    }).done((res, err)=>{console.log(res,err)});
+      //    // $.post(`${window.location.origin}/messages`, message)
+      // }
+    </script>
+  </body>
+</html>
