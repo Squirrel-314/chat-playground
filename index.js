@@ -12,26 +12,50 @@ mongoose.connect(dbUrl , (err) => {
    if (err) console.log(err);
    else console.log("MongoDB Connected!");
 });
-var Message = mongoose.model("Message", { name: String, message: String });
 
+var Message = mongoose.model("Message", {
+   name: String,
+   msg: String,
+   on: String
+});
 
-app.get('/', (req, res) => {
+app.get("/", (req, res) => {
    res.sendFile(__dirname + '/index.html');
 });
 
-io.on('connection', (socket) => {
+app.get("/messages", (req, res) => {
+   // console.log("Fetched Messages!")
+   Message.find({}, (err, messages) => {
+      res.send(messages);
+   })
+});
+
+io.on("connection", (socket) => {
    // console.log('a user connected');
    socket.on('disconnect', () => {
       // console.log('user disconnected');
    });
 });
 
-io.on('connection', (socket) => {
-   socket.on('chat message', (msg) => {
-      console.log(msg)
-      io.emit('chat message', msg);
+io.on("connection", (socket) => {
+   socket.on('chat message', (msgData) => {
+      // console.log(msgData);
+      saveMsg(msgData);
+      io.emit('chat message', msgData);
    });
 });
+
+function saveMsg(msgData) {
+   const newMsg = new Message({
+      name: msgData.name,
+      msg: msgData.msg,
+      on: msgData.on
+   });
+   newMsg.save((err, result) => {
+      if (err) { console.log(err); }
+      else { return result; }
+   });
+}
 
 // mongodb version
 // io.on("connection", () =>{

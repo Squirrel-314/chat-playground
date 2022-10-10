@@ -7,7 +7,8 @@
       body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
       #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
-      #name, #message { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+      #name, #message { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem .8rem .8rem 2rem; margin: 0.25rem; }
+      #message { flex-grow: 3; border-radius: .8rem 2rem 2rem .8rem; margin-left: 0 }
       #name:focus, #message:focus { outline: none; }
       #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
 
@@ -41,12 +42,23 @@
          }
       });
     
-      socket.on('chat message', function(msg) {
+      socket.on('chat message', addMessage);
+
+      getMessages();
+
+      function getMessages() {
+         $.get(`${window.location.origin}/messages`, (data) => {
+            console.log("Fetched Messages:", data);
+            data.forEach(addMessage);
+         });
+      }
+
+      function addMessage(msg) {
          var item = document.createElement('li');
          item.innerHTML = `${msg.msg} <br> Posted by <i>${msg.name}</i> ${mdy(msg.on)} at ${thetime(msg.on)} ${dateDiff(msg.on)}`;
          messages.appendChild(item);
          window.scrollTo(0, document.body.scrollHeight);
-      });
+      }
 
 
       function mdy(dateString) {
@@ -59,9 +71,9 @@
       function thetime(dateString) {
          let dateObj = new Date(dateString);
          let hours, mins;
-         if (dateObj.getHours().length < 2) { hours = `0${dateObj.getHours()}` }
+         if (dateObj.getHours().toString().length < 2) { hours = `0${dateObj.getHours()}` }
          else { hours = `${dateObj.getHours()}` }
-         if (dateObj.getMinutes().length < 2) { mins = `0${dateObj.getMinutes()}` }
+         if (dateObj.getMinutes().toString().length < 2) { mins = `0${dateObj.getMinutes()}` }
          else { mins = `${dateObj.getMinutes()}` }
          return `${hours}:${mins}`;
       }
