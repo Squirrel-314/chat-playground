@@ -7,6 +7,10 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
+app.use("/", express.static(__dirname + "/assets"));
+app.use("/styles", express.static(__dirname + "/styles"));
+app.use("/scripts", express.static(__dirname + "/scripts"));
+
 const dbUrl = "mongodb+srv://Squirrel:nCCJ0sQuQQ5qhGsn@test-user-data.daqv1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 mongoose.connect(dbUrl , (err) => { 
    if (err) console.log(err);
@@ -56,41 +60,5 @@ function saveMsg(msgData) {
       else { return result; }
    });
 }
-
-// mongodb version
-// io.on("connection", () =>{
-//    // console.log("a user is connected")
-// });
-
-// app.get("/messages", (req, res) => {
-//    // console.log("fetched messages")
-//    Message.find({},(err, messages)=> {
-//       res.send(messages);
-//    })
-// });
-
-// app.post("/messagesss", (req, res) => {
-
-//    // const newChat = new Message({
-//    //    input: req.body.input,
-//    //    user: signedInUser.name,
-//    //    avatar: signedInUser.avatar,
-//    //    datePosted: timePosted
-//    // });
-//    // newChat.save((err, result) => {
-//    //    if (err) { console.log(err); }
-//    //    else { res.send(result); return result; }
-//    // });
-
-//    console.log(req.body)
-//    var message = new Message(req.body);
-//    message.save((err) =>{
-//      if(err)
-//        sendStatus(500);
-//      io.emit('message', req.body);
-//      res.sendStatus(200);
-//    })
-// })
-
 
 server.listen(4000);
