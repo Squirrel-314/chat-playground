@@ -1,8 +1,8 @@
-const express = require('express');
+const express = require("express");
 const mongoose = require("mongoose");
 
 const app = express();
-const http = require('http');
+const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
@@ -61,4 +61,4 @@ function saveMsg(msgData) {
    });
 }
 
-server.listen(4000);
+server.listen(3000);

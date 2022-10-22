@@ -24,12 +24,22 @@ function getMessages() {
 }
 
 function addMessage(msg) {
+   // addTerminalMessage(msg);
    var item = document.createElement("li");
    setInterval(updateMsg, 60000);
    messages.appendChild(item);
    window.scrollTo(0, document.body.scrollHeight);
    updateMsg();
-   function updateMsg() { console.log("update"); item.innerHTML = `${msg.msg} <br> Posted by <i>${msg.name}</i> ${mdy(msg.on)} at ${thetime(msg.on)} ${dateDiff(msg.on)}`; }
+   function updateMsg() { item.innerHTML = `${msg.msg} <br> Posted by <i>${msg.name}</i> ${mdy(msg.on)} at ${thetime(msg.on)} ${dateDiff(msg.on)}`; }
+}
+
+function addTerminalMessage(msg) {
+   var item = document.createElement("li");
+   setInterval(updateMsg, 60000);
+   messages.appendChild(item);
+   window.scrollTo(0, document.body.scrollHeight);
+   updateMsg();
+   function updateMsg() { item.innerHTML = `<span style="color: #80ff63">~${msg.name.toString().toLowerCase().replaceAll(" ", "")}@worldchat</span>:/<span style="color: #93c5ff">chat</span>$ ${msg.msg} <br> <span style="color: #aaa">Posted ${mdy(msg.on)} at ${thetime(msg.on)} ${dateDiff(msg.on)}</span>`; }
 }
 
 function mdy(dateString) {
