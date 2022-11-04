@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Squirrel-314/chat-playground-thing-yay.git"
+    "url": "git+https://github.com/editorrust/chat-playground.git"
   },
-  "author": "Editor Squirrel",
+  "author": "Editor Rust",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Squirrel-314/chat-playground-thing-yay/issues"
+    "url": "https://github.com/editorrust/chat-playground/issues"
   },
-  "homepage": "https://github.com/Squirrel-314/chat-playground-thing-yay#readme",
+  "homepage": "https://github.com/editorrust/chat-playground#readme",
   "dependencies": {
     "body-parser": "^1.20.1",
     "dotenv": "^16.0.2",
