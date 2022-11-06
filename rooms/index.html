@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <script src="main.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <title>Socket Rooms Chat</title>
+  </head>
+  <body onload="onload()">
+    <div id = "Main" class="hidden">
+      <h1>Multi-room chat</h1>
+      <div id = "AccessPort" class="hidden">
+        <label id="NameLabel" class="hidden">Name</label>
+        <input id="NameInput" type="text" class="hidden">
+        <br><br>
+        <label id="IDLabel" class="hidden">Room ID</label>
+        <input id="IDInput" value="Room1" type="text" class="hidden">
+        <input id="ConnectButton" type="submit" value="Create/Join Room" onclick="Connect()">
+      </div>
+      <h2 id="room">Room: none</h2>
+      <div id="chat">
+         <div class="msgs"></div>
+         <p id="msg"></p>
+         <input id="ComposedMessage" type = "text">
+         <input id="SendMessage" onclick="Send()" type="submit" value="Send"> 
+      </div>
+    </div>
+  </body>
+</html>

@@ -10,7 +10,7 @@ const nodemailer = require("nodemailer");
 const { v4: uuidv4 } = require("uuid");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 const connection = mongoose.connection;
 
 // This will be changed later when the user signs in
