@@ -1,0 +1,28 @@
+* {
+   padding: 0;
+   margin: 0;
+}
+
+body {
+   overflow: hidden;
+}
+
+.chat {
+   display: none;
+   grid-template-columns: auto 22rem;
+}
+
+.msgBox {
+   display: grid;
+   grid-template-rows: auto auto;
+   overflow: auto;
+}
+
+.about {
+   margin: .5rem;
+   padding: 1rem .8rem;
+   height: calc(100vh - 1rem);
+   background-color: #f6f6f6;
+   box-sizing: border-box;
+   border-radius: .4rem;
+}

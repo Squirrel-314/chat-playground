@@ -1,28 +1,32 @@
 <!DOCTYPE HTML>
 <html>
-  <head>
-    <script src="main.js"></script>
-    <script src="socket.io/socket.io.js"></script>
-    <title>Socket Rooms Chat</title>
-  </head>
-  <body onload="onload()">
-    <div id = "Main" class="hidden">
-      <h1>Multi-room chat</h1>
-      <div id = "AccessPort" class="hidden">
-        <label id="NameLabel" class="hidden">Name</label>
-        <input id="NameInput" type="text" class="hidden">
-        <br><br>
-        <label id="IDLabel" class="hidden">Room ID</label>
-        <input id="IDInput" value="Room1" type="text" class="hidden">
-        <input id="ConnectButton" type="submit" value="Create/Join Room" onclick="Connect()">
+   <head>
+      <link rel="shortcut icon" href="images/chat.png" type="image/x-icon">
+      <link rel="stylesheet" href="styles.css">
+      <script src="socket.io/socket.io.js"></script>
+      <title>Chat</title>
+   </head>
+   <body>
+      <form class="join" action="javascript:join()">
+         <label id="NameLabel">Name</label>
+         <input id="NameInput" type="text" class="hidden">
+         <br><br>
+         <label id="IDLabel">Room: </label>
+         <input id="roomInput" value="World Chat" type="text">
+         <button type="submit">Create/Join Room</button>
+      </form>
+      <div class="chat">
+         <div class="msgBox">
+            <div class="msgs"></div>
+            <form action="javascript:post()">
+               <input id="newMSg" type="text">
+               <button type="submit">Send!</button>
+            </form>
+         </div>
+         <div class="about">
+            <h2 class="room">Room: none</h2>
+         </div>
       </div>
-      <h2 id="room">Room: none</h2>
-      <div id="chat">
-         <div class="msgs"></div>
-         <p id="msg"></p>
-         <input id="ComposedMessage" type = "text">
-         <input id="SendMessage" onclick="Send()" type="submit" value="Send"> 
-      </div>
-    </div>
-  </body>
+   </body>
+   <script src="main.js"></script>
 </html>

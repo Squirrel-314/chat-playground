@@ -1,41 +1,32 @@
-let socket, msgBox, usernameInput, chatIDInput, messageInput, chatRoom;
-let messages = [];
+let socket = io();
+let msgBox = document.querySelector(".msgs");
+let usernameInput = document.getElementById("NameInput");
+let chatIDInput = document.getElementById("roomInput");
+let messageInput = document.getElementById("newMSg");
 
-function onload() {
-  socket = io();
-  usernameInput = document.getElementById("NameInput");
-  chatIDInput = document.getElementById("IDInput");
-  messageInput = document.getElementById("ComposedMessage");
-  chatRoom = document.getElementById("room");
-  msgBox = document.querySelector(".msgs");
+socket.on("join", function(room) {
+   document.querySelector(".room").textContent = "Room: " + room;
+   document.title = `${room} | Chat`;
+});
 
-  socket.on("join", function(room){
-    chatRoom.innerHTML = "Chatroom: " + room;
-  });
+socket.on("recieve", function(message) {
+   let msg = document.createElement("P");
+   msg.textContent = message;
+   msgBox.appendChild(msg);
 
-  socket.on("recieve", function(message){
-    console.log(message);
-    if (messages.length < 9) {
-      messages.push(message);
-    }
-    else {
-      messages.shift();
-      messages.push(message);
-    }
-    msgBox.innerHTML = "";
-    for (i = 0; i < messages.length; i++) {
-      let msg = document.createElement("P");
-      msg.textContent = messages[i];
-      msgBox.appendChild(msg);
-    }
-  })
+});
+
+function join() {
+   if (usernameInput.value != "") {
+      socket.emit("join", chatIDInput.value, usernameInput.value);
+      document.querySelector(".join").remove();
+      document.querySelector(".chat").style.display = "grid";
+   }
 }
 
-function Connect() {
-   socket.emit("join", chatIDInput.value, usernameInput.value);
-}
-
-function Send() {
-   socket.emit("send", messageInput.value);
-   messageInput.value = "";
+function post() {
+   if (messageInput.value != "") {
+      socket.emit("send", messageInput.value);
+      messageInput.value = "";
+   }
 }
