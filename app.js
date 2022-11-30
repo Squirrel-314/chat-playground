@@ -1,93 +1,311 @@
 /* =============
 // Data
 ============= */
-// System variables
-require("dotenv").config();
+
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const nodemailer = require("nodemailer");
+const bcrypt = require("bcrypt");
 const { v4: uuidv4 } = require("uuid");
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 const connection = mongoose.connection;
 
-// This will be changed later when the user signs in
-let signedIn = false;
+const saltRounds = 12;
+
+let signedIn;
 let signedInUser = "(not signed in)";
 
-// This basically sets and starts all the libraries
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-// This sets the base filepath for assets to /assets. It can be changed to anything
-app.use("/", express.static(__dirname + "/assets"));
-app.use("/styles", express.static(__dirname + "/styles"));
-app.use("/scripts", express.static(__dirname + "/scripts"));
-// Ejs is the view engine, it lets use use system varibles in html
+app.use(express.static(__dirname + "/assets/"));
+app.use("/styles", express.static(__dirname + "/styles/"));
+app.use("/scripts", express.static(__dirname + "/scripts/"));
 app.set("view engine", "ejs");
 
 // Mongoose things
 mongoose.Promise = global.Promise;
-// Acutally connect to the database with the connection link. You'll need to create a user on the database so you'll get access
 mongoose.connect(process.env.MONGODB_URI, { useUnifiedTopology: true, useNewUrlParser: true });
-
-// nodemailer things
-// What this does is setup the mailer, so we can email people when they sign up. Eventually we'll use this to send change password emails
-const transporter = nodemailer.createTransport({
-   service: "gmail",
-   auth: {
-      user: process.env.VD_EMAIL,
-      pass: process.env.VD_EMAIL_PASSCODE
-  }
-});
-
-// System things
-connection.on("error", console.error.bind(console, 'Connection error: '));
+connection.on("error", console.error.bind(console, "Connection error: "));
 
 // Schemas
-// These are the basic datasets. Anything being saved to Mongo must be in schema format. If you're adding a value, add it here then run some code from oldapp.js to set it for all old users
-const privateChatSchema = new mongoose.Schema({
-   code: String,
-   name: String,
-   users: Array,
-   // because it'll be like [["jane", "admin"], ["john", "member"], ["drew", "viewer"]]
-   messages: Array
-});
-
-const useDataSchema = new mongoose.Schema({
-   userCode: String,
-   name: String,
+const userSchema = new mongoose.Schema({
+   username: String,
    email: String,
-   passcode: String,
-   avatar: String,
-   chats: [],
-   dateAccountStarted: Date,
-   lastPlayed: Date,
-   dashcoins: Number,
-   friends: [],
-   friendInvitesSent: [],
-   friendInvitesRecived: [],
-   gameSave: {}
+   password: String,
+   bio: String,
+   links: [],
+   created: Date,
+   handle: String,
+   chats: [], // list of chat ids
 });
 
 const chatSchema = new mongoose.Schema({
-   input: String,
-   user: String,
-   avatar: Number,
-   datePosted: Object
+   members: [],
+   name: String,
+   about: String,
+   id: String,
+   created: Date,
+   messages: [],
+   settings: {}
 });
 
 // Set the schemas
-const PrivateChat = mongoose.model("PrivateChat", privateChatSchema);
-const UserData = mongoose.model("UserData", useDataSchema);
-const Chat = mongoose.model("Chat", chatSchema);
+const Users = mongoose.model("Users", userSchema);
+const Chats = mongoose.model("Chats", chatSchema);
 
 /* =============
 // Processing
 ============= */
 
-// The send email function, just to clean things up
+// Sign in
+function signIn(userInfo) {
+   signedIn = true;
+   signedInUser = userInfo;
+}
+
+// Basic data for each page
+function getNewpageData() {
+   return new Promise(resolve => {
+      Users.find((err, users) => {
+         // users.forEach((user) => { console.log(user); });
+         if (err) { console.error(err); }
+         else { 
+            Chats.find((err, chats) => {
+               // chats.forEach((chat) => { console.log(chat); });
+               if (err) { console.error(err); }
+               else {
+                  let returnData = {
+                     user: signedInUser,
+                     users: users,
+                     chats: chats
+                  }
+                  resolve(returnData);
+                  return returnData;
+               }
+            });
+         }
+      });
+   });
+}
+
+/* =============
+// Get requests
+============= */
+
+// Public user pages
+
+app.get("/", (req, res) => { goSomewhere(res, "home"); });
+app.get("/your-chats", (req, res) => { goSomewhere(res, "projects"); });
+app.get("/account", (req, res) => { goSomewhere(res, "account"); });
+app.get("/new-chat", (req, res) => { goSomewhere(res, "project/create"); });
+
+app.get("/:projectname/dashboard", (req, res) => {
+   ProjectData.findOne({ name: req.params.projectname }, (err, project) => {
+      if (err) { console.error(err); }
+      else if (project == null) { res.render("lost"); }
+      else {
+         letsGo();
+         async function letsGo() {
+            let returnedData = await getNewpageData();
+            returnedData.thisProject = project;
+            res.render("project/dashboard", returnedData);
+         }
+      }
+   });
+});
+
+app.get("/:projectname/edit", (req, res) => {
+   ProjectData.findOne({ name: decodeURI(req.params.projectname) }, (err, project) => {
+      if (err) { console.error(err); }
+      else if (project == null) { res.render("lost"); }
+      else {
+         letsGo();
+         async function letsGo() {
+            let returnedData = await getNewpageData();
+            returnedData.thisProject = project;
+            res.render("project/edit", returnedData);
+         }
+      }
+   });
+});
+
+app.get("/:projectname/settings", (req, res) => {
+   ProjectData.findOne({ name: decodeURI(req.params.projectname) }, (err, project) => {
+      if (err) { console.error(err); }
+      else if (project == null) { res.render("lost"); }
+      else {
+         letsGo();
+         async function letsGo() {
+            let returnedData = await getNewpageData();
+            returnedData.thisProject = project;
+            res.render("project/settings", { user: JSON.stringify(returnedData.user), project: project });
+         }
+      }
+   });
+});
+
+app.get("/:projectname/finetune", (req, res) => {
+   ProjectData.findOne({ name: decodeURI(req.params.projectname) }, (err, project) => {
+      if (err) { console.error(err); }
+      else if (project == null) { res.render("lost"); }
+      else {
+         letsGo();
+         async function letsGo() {
+            let returnedData = await getNewpageData();
+            returnedData.thisProject = project;
+            res.render("project/control", { user: JSON.stringify(returnedData.user), project: JSON.stringify(project), thisProject: returnedData.thisProject });
+         }
+      }
+   });
+});
+
+// Temporary landings
+app.get("/sign-out", (req, res) => {
+   signedIn = false;
+   user = null;
+   signedInUser = "(not signed in)";
+   res.redirect("/");
+});
+
+function goSomewhere(res, where) {
+   letsGo();
+   async function letsGo() {
+      let returnedData = await getNewpageData();
+      res.render(where, returnedData);
+   }
+}
+
+/* =============
+// Account
+============= */
+
+// Sign in
+app.post("/user/login", (req, res) => {
+   Users.findOne({ username: req.body.name }, (err, user) => {
+      if (err) return console.error(err);
+      if (!user) { res.send("There is no account with this name!"); }
+      else if (user) {
+         bcrypt.compare(req.body.pscd, user.password)
+            .catch(err => console.error(err.message))
+            .then(match => {
+               if (match) { signIn(user); res.send("Success!"); }
+               else res.send("Wrong password!");
+         });
+      }
+   });
+});
+
+// Signup
+app.post("/user/create", (req, res) => {
+   asyncCreate();
+   async function asyncCreate() {
+      let isAlreadyUsedName = await Users.findOne({ username: req.body.name });
+      if (isAlreadyUsedName) { res.send("Choose a different name! (This one is taken!)"); }
+      else {
+         // Problem with this
+         let isAlreadyUsedEmil = await Users.findOne({ email: req.body.emil });
+         if (isAlreadyUsedEmil.email) { res.send("This email is already used!"); }
+         else {
+            bcryptForMe(req.body.pscd).then((passhash) => {
+               const newDev = new Users({
+                  username: req.body.name,
+                  userCall: req.body.name,
+                  email: req.body.emil,
+                  password: passhash,
+                  bio: "an empty page, filled with endless possibilities",
+                  githubClientId: "false"
+               });
+               newDev.save(function (err) { if (err) return console.error(err); });
+               sendEmail(
+                  "Hurray! Your Git Organized account has been created!",
+                  `<h2>Hurray!</h2>
+                  <h4>Your Git Organized account has been created!</h4>
+                  <p>I just wanted to let you know that your account (${req.body.name}) has been created. I will not send promotional emails unless you want me to. The only other emails I will send shall be triggered by your actions on my site.</p>
+                  <i>Editor Rust :)</i>
+                  <p>vegetabledash@gmail.com</p>`,
+                  req.body.emil
+               );
+               // Sign in and go home
+               Users.findOne({ name: req.body.name, email: req.body.emil, passcode: req.body.pscd }, (err, user) => {
+                  if (err) return console.error(err);
+                  else {
+                     console.log(user);
+                     signIn(user); res.send("Success!"); }
+               });
+            });
+         }
+      }
+   }
+});
+
+let bcryptForMe = (pass) => {
+   return new Promise((resolve) => {
+      bcrypt.hash(pass, saltRounds)
+      .catch(err => console.error(err.message))
+      .then(hash => { resolve(hash); });
+   });
+}
+
+
+/* =============
+// Create Chat
+============= */
+
+app.post("/newchat", (req, res) => {
+   const newChat = new Chats({
+      members: [signedInUser.username],
+      name: req.body.name,
+      about: req.body.about,
+      id: uuidv4(),
+      created: req.body.date,
+      messages: [],
+      settings: req.body.settings,
+      /*
+      type:
+      public edit - anyone can view and edit
+      public view - anyone can view, invite to edit (toggle invites)
+      private edit - people invited can edit
+      private view - people invited can view, invite to edit (toggle invites)
+      note:
+      allow anonymous on chats - option
+      */
+   });
+   newChat.save(function (err) {
+      if (err) return console.error(err);
+      else { res.send("Success!"); }
+   });
+});
+
+// const newChat = new Chats({
+//    members: [signedInUser.handle],
+//    name: "ChatTest v4 Clearance9",
+//    about: "Test chat - it has a long, hard road ahead.",
+//    id: uuidv4(),
+//    created: Date.now(),
+//    messages: [],
+//    settings: { type: "public edit" },
+// });
+// newChat.save(function (err) {
+//    if (err) return console.error(err);
+//    else { res.send("Success!"); }
+// });
+
+
+/* =============
+// Mail
+============= */
+
+// You've got mail. Wait a second, ok now you do.
+const transporter = nodemailer.createTransport({
+   service: "gmail",
+   auth: {
+      user: "vegetabledash@gmail.com",
+      pass: "rgagablxdefsiymr"
+  }
+});
+
 function sendEmail(title, text, recipient) {
    var mailOptions = {
       from: "vegetabledash@gmail.com",
@@ -101,211 +319,18 @@ function sendEmail(title, text, recipient) {
    });
 }
 
-// Sign in
-function signIn(userInfo) {
-   signedIn = true;
-   signedInUser = userInfo;
-}
-
-// Basic data for each page
-function getNewpageData() {
-   return new Promise(resolve => {
-      UserData.find((err, users) => {
-         if (err) { console.error(err); }
-         else {
-            Chat.find(function(err, found) {
-               if (err) { console.log(err); }
-               else {
-                  PrivateChat.find(function(err, doc) {
-                     if (err) { console.log(err); }
-                     else {
-                        let returnData = {
-                           user: signedInUser,
-                           UserData: UserData,
-                           users: users,
-                           foundItems: found,
-                           chats: doc
-                        }
-                        resolve(returnData);
-                        return returnData;
-                     }
-                  });
-               }
-            });
-         }
-      });
-   });
-}
+// sendEmail("hey there", "hi", "editorrust@gmail.com"); // Ack private email alert! Whatever. Let me get back to listening to my 10 hour fan sounds (https://www.youtube.com/watch?v=C5Gm8UvxKlU)
 
 /* =============
-// Get requests
+// Important stuff
 ============= */
-
-async function letsGoTo(RES, page) {
-   let returnedData = await getNewpageData();
-   RES.render(page, returnedData);
-}
-
-// Public user pages
-app.get("/users/:username", (req, res) => {
-   UserData.findOne({ name: req.params.username }, (err, user) => {
-      if (err) { console.error(err); }
-      else if (user == null) { res.render("no-such-user"); }
-      else { res.render("user-profile", { user: user, name: user.name }); }
-   });
-});
-
-// If someone in the browser types a /, it'll go to the homepage
-app.get("/", (req, res) => {
-   // Because we set the view engine as ejs, this will render the home.ejs file in the view foler
-   // The second input is an object with the variables we'll send to the page
-   letsGoTo(res, "home");
-});
-
-app.get("/feelin-chatty", (req, res) => { letsGoTo(res, "fullchat"); });
-
-
-// Temporary landings
-app.get("/sign-out", (req, res) => {
-   // This is not an actuall page, because it immediately send you back
-   signedIn = false;
-   user = null;
-   signedInUser = "(not signed in)";
-   res.redirect("/");
-});
-
-/* =============
-// Account
-============= */
-
-// Sign in
-app.post("/signin", (req, res) => {
-   UserData.findOne({ name: req.body.name, email: req.body.emil, passcode: req.body.pscd }, (err, user) => {
-      if (err) return console.error(err);
-      if (!user) { res.send("The data dosen't line up. Try again!"); }
-      else if (user) {
-         signIn(user);
-         res.send("Successful signin!");
-      }
-   });
-});
-
-/* =============
-// Chats
-============= */
-
-app.post("/new-chat", (req, res) => {
-   let chatCode = uuidv4();
-   const newChat = new PrivateChat({
-      code: chatCode,
-      name: req.body.name,
-      users: [[signedInUser.name, "admin"]]
-   });
-   UserData.findOneAndUpdate(
-      { name: signedInUser.name },
-      { $addToSet: { chats: chatCode } },
-      { new: true },
-      (err, doc) => {  if (err) return console.error(err); }
-   );
-   newChat.save((err, result) => {
-      if (err) { console.log(err); }
-      else { res.redirect("/"); }
-   });
-}); 
-
-/* =============
-// Chat
-============= */
-
-app.post("/chat-message", (req, res) => {
-   let timePosted = new Date(req.body.datePosted);
-   const newChat = new Chat({
-      input: req.body.input,
-      user: signedInUser.name,
-      avatar: signedInUser.avatar,
-      datePosted: timePosted
-   });
-   newChat.save((err, result) => {
-      if (err) { console.log(err); }
-      else { res.send(result); return result; }
-   });
-}); 
-
-app.post("/edit-message", (req, res) => {
-   Chat.findByIdAndUpdate(
-      req.body.msgId,
-      { input: req.body.newMessage,
-        avatar: signedInUser.avatar },
-      { new: true },
-      (err, doc) => { if (err) return console.error(err); }
-   );
-   Chat.findOne({ name: signedInUser.name }, (err, doc) => {
-      if (err) return console.error(err);
-      else { res.send("Edited Successfully."); }
-   });
-});
-
-app.post("/delete-message", (req, res) => {
-   Chat.deleteOne( { _id: req.body.msgId }, (err) => { if (err) return console.error(err); } );
-   Chat.findOne({ name: signedInUser.name }, (err, doc) => {
-      if (err) return console.error(err);
-      // else { res.redirect("/"); }
-      else { res.send("Deleted Successfully."); }
-   });
-});
-
-/* =============
-// Video
-============= */
-
-// All this stuff is experimental, I'm just testing it, so I don't fully understand it. I did only start developing like 2 years ago
-const server = require("http").Server(app);
-const io = require("socket.io")(server, { cors: { origin: "*" } });
-const { ExpressPeerServer } = require("peer");
-const peerServer = ExpressPeerServer(server, { debug: true, });
-
-app.use("/peerjs", peerServer);
-app.use(express.static("public"));
-
-app.get("/start-video", (req, res) => {
-   res.redirect(`/video-chat/${uuidv4()}`);  
-});
-
-app.get("/video-chat/:room", (req, res) => {
-   res.render("videoroom", { roomId: req.params.room });
-});
-
-let listOfPeers = [];
-
-peerServer.on("connection", (data) => {
-   listOfPeers.push(data.id);
-});
-
-io.on("connection", (socket) => {
-   // socket.broadcast.emit("user-connected", socket.id);
-   let userId;
-   socket.on("join-room", (roomId, usrId, userName) => {
-      userId = usrId;
-      socket.join(roomId);
-      socket.emit("listOfPeers", listOfPeers);
-      socket.broadcast.emit("user-connected", userId);
-      socket.on("message", (message) => {
-         io.to(roomId).emit("createMessage", message, userName);
-      });
-   });
-   socket.on("disconnect", () => {
-      if (listOfPeers.indexOf(5) > -1) { listOfPeers.splice(listOfPeers.indexOf(userId), 1); }
-      socket.broadcast.emit("user-disconnected", userId);
-   });
-});
 
 // Get all lost requests
 app.get("*", (req, res) => {
-   res.render("page-not-found");
+   res.send("lost!");
 });
 
-// This is what actually starts the server
-server.listen(port);
+app.listen(port);
 
-// Testing
-UserData.findOne({ name: "Squirrel" }, (err, user) => { signIn(user); });
+// Auto sign in me
+Users.findOne({ name: "Editor Rust" }, (err, user) => { signIn(user); });
