@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <link rel="stylesheet" href="styles/tailwind.css">
+   <link rel="stylesheet" href="styles/main.css">
+   <script src="socket.io/socket.io.js"></script>
+   <title><%= chat.name %> | Chat Ex</title>
+</head>
+<body>
+   <%- include("partials/panel") %>
+   <div class="h-[100vh] overflow-auto">
+      <% if (chat.settings.type == "public edit" || chat.members.includes(user.username)) { %>
+         <!-- Can edit -->
+         <div class="sticky top-0 left-0 right-0 py-2 bg-white border-b-2 border-gray-100">
+            <h3 class="m-2 mx-4 text-3xl"><%= chat.name %></h3>
+         </div>
+         <div class="messageBox py-4 px-2">
+            <% chat.messages.forEach(function(msg) { %>
+               <div class="py-2 px-4 my-2 border-b-2 border-gray-100">
+                  <p class="text-lg"><%= msg.msg %></p>
+                  <p>Posted by <%= users.find(x => x.id == msg.user).username %></p>
+                  <p class="text-gray-700">On <%= new Date(msg.date).toLocaleString() %></p>
+               </div>
+            <% }); %>
+         </div>
+         <form action="javascript:post()">
+            <input id="newMSg" type="text">
+            <button type="submit">Send!</button>
+         </form>
+      <% } else if (chat.settings.type == "public view") { %>
+         <!-- Can view - show option to send invite request -->
+         <div class="sticky top-0 left-0 right-0 py-2 border-b-2 border-gray-100">
+            <h3 class="m-2 mx-4 text-3xl"><%= chat.name %></h3>
+         </div>
+         <div class="messageBox py-4 px-2">
+            <% chat.messages.forEach(function(msg) { %>
+               <div>
+                  <p><%= msg.msg %></p>
+                  <p>Posted by <%= users.find(x => x.id == msg.user).username %></p>
+                  <p>On <%= new Date(msg.date).toLocaleString() %></p>
+               </div>
+            <% }); %>
+         </div>
+      <% } else { %>
+         <p>You can't access this chat.</p>
+      <% } %>
+   </div>
+</body>
+<%- include("partials/menu") %>
+<script>
+   let username, usercode, chatId;
+   username = <%- JSON.stringify(user.username) %>;
+   usercode = <%- JSON.stringify(user._id) %>;
+   chatId = <%- JSON.stringify(chat.id) %>;
+</script>
+<script src="scripts/chat.js"></script>
+</html>

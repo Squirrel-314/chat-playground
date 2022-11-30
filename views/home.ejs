@@ -1,52 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/brands.min.css">
    <link rel="stylesheet" href="styles/tailwind.css">
+   <link rel="stylesheet" href="styles/main.css">
    <title>Chat Ex</title>
 </head>
-<style>
-body {
-   height: 100vh;
-   display: grid;
-   grid-template-columns: 30% 70%;
-}
-.menuhov {
-   position: fixed;
-   top: 30%;
-   right: 0;
-   bottom: 30%;
-   width: .5rem;
-   display: flex;
-   align-items: center;
-}
-.menu {
-   width: 3.5rem;
-   margin-left: .5rem;
-   transition: .2s;
-}
-.menuhov:hover .menu {
-   margin-left: -3.5rem;
-}
-</style>
 <body>
-   <div class="border-r-4 border-gray-100">
-      <h2 class="m-6 text-3xl">Chat Ex</h2>
-      <p>Chats you are in</p>
-      <% user.chats.forEach(function(chat) { %>
-         
-         <div class="m-4 py-4 px-6 bg-gray-50 rounded-lg">
-            <h2 class="text-xl"><%= chats.find(x => x.id == chat).name %></h2>
-            <p class="text-gray-600"><%= chats.find(x => x.id == chat).about %></p>
-            <p class="text-md"><%= chats.find(x => x.id == chat).members.length %> member(s)</p>
-         </div>
-      <% }); %>
-   </div>
+   <%- include("partials/panel") %>
    <div>
       <h3 class="m-2 mx-4 text-3xl">Check out some public chats</h3>
       <% chats.forEach(function(chat) { %>
-         <% if (chat.type = "public edit") { %>
+         <% if (chat.settings.type == "public edit") { %>
             <div class="m-4 py-4 px-6 bg-gray-50 rounded-lg">
                <h2 class="text-2xl"><%= chat.name %></h2>
                <h3 class="text-lg text-gray-800"><%= chat.about %></h3>
@@ -60,11 +24,5 @@ body {
       <% }); %>
    </div>
 </body>
-<div class="menuhov">
-   <div class="menu px-2 py-4 bg-white border-2 border-gray-100 rounded-full">
-      <a href="/"><span class="pl-1.5 mb-1.5 text-gray-600 hover:text-gray-800 transition text-2xl fa fa-home"></span></a>
-      <a href="/"><span class="pl-1.5 mb-1.5 text-gray-600 hover:text-gray-800 transition text-2xl fa fa-circle-user"></span></a>
-      <a href="https://github.com/editorrust/chat-playground" target="_blank"><span class="pl-1.5 text-gray-600 hover:text-gray-800 transition text-2xl fa-brands fa-github"></span></a>
-   </div>
-</div>
+<%- include("partials/menu") %>
 </html>

@@ -1,0 +1,25 @@
+body {
+   height: 100vh;
+   display: grid;
+   grid-template-columns: 30% 70%;
+}
+
+.menuhov {
+   position: fixed;
+   top: 30%;
+   right: 0;
+   bottom: 30%;
+   width: .5rem;
+   display: flex;
+   align-items: center;
+}
+
+.menu {
+   width: 3.5rem;
+   margin-left: .5rem;
+   transition: .2s;
+}
+
+.menuhov:hover .menu {
+   margin-left: -3.5rem;
+}

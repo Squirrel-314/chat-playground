@@ -28,7 +28,7 @@
     "mongoose": "^6.6.1",
     "nodemailer": "^6.7.8",
     "peer": "^0.6.1",
-    "socket.io": "^4.5.2",
+    "socket.io": "^4.5.4",
     "tailwind": "^4.0.0",
     "uuid": "^9.0.0"
   },

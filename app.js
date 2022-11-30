@@ -94,77 +94,83 @@ function getNewpageData() {
 // Get requests
 ============= */
 
-// Public user pages
+
+const http = require("http");
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const e = require("express");
+const io = new Server(server);
+const rooms = [], usernames = [];
+
+
+io.on("connection", (socket) => {
+   socket.on("join", (room, username) => {
+      rooms[socket.id] = room;
+      usernames[socket.id] = username;
+      socket.leaveAll();
+      socket.join(room);
+      socket.emit("join", room);
+   });
+
+   socket.on("send", (message) => {
+      saveMsg(message.chat, message.data);
+      Users.findById(message.data.user, (err, user) => {
+         if (err) console.log(err);
+         else {
+            let newMessage = message.data;
+            newMessage.user = user.username;
+            io.in(rooms[socket.id]).emit("recieve", newMessage);
+         }
+      });
+   });
+});
+
+
+function saveMsg(chat, msgData) {
+   Chats.findOneAndUpdate({ id: chat }, {
+      $push: { messages: msgData }
+   }, (err) => { if (err) console.log(err); });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.get("/", (req, res) => { goSomewhere(res, "home"); });
-app.get("/your-chats", (req, res) => { goSomewhere(res, "projects"); });
-app.get("/account", (req, res) => { goSomewhere(res, "account"); });
-app.get("/new-chat", (req, res) => { goSomewhere(res, "project/create"); });
 
-app.get("/:projectname/dashboard", (req, res) => {
-   ProjectData.findOne({ name: req.params.projectname }, (err, project) => {
-      if (err) { console.error(err); }
-      else if (project == null) { res.render("lost"); }
-      else {
-         letsGo();
-         async function letsGo() {
+app.get("/:chatid", (req, res) => {
+   Chats.findOne({ id: req.params.chatid }, (err, chat) => {
+      if (err) console.error(err);
+      else if (chat) {
+         awaitData();
+         async function awaitData() {
             let returnedData = await getNewpageData();
-            returnedData.thisProject = project;
-            res.render("project/dashboard", returnedData);
+            returnedData.chat = chat;
+            res.render("chat", returnedData);
          }
+         
       }
-   });
-});
-
-app.get("/:projectname/edit", (req, res) => {
-   ProjectData.findOne({ name: decodeURI(req.params.projectname) }, (err, project) => {
-      if (err) { console.error(err); }
-      else if (project == null) { res.render("lost"); }
-      else {
-         letsGo();
-         async function letsGo() {
-            let returnedData = await getNewpageData();
-            returnedData.thisProject = project;
-            res.render("project/edit", returnedData);
-         }
-      }
-   });
-});
-
-app.get("/:projectname/settings", (req, res) => {
-   ProjectData.findOne({ name: decodeURI(req.params.projectname) }, (err, project) => {
-      if (err) { console.error(err); }
-      else if (project == null) { res.render("lost"); }
-      else {
-         letsGo();
-         async function letsGo() {
-            let returnedData = await getNewpageData();
-            returnedData.thisProject = project;
-            res.render("project/settings", { user: JSON.stringify(returnedData.user), project: project });
-         }
-      }
-   });
-});
-
-app.get("/:projectname/finetune", (req, res) => {
-   ProjectData.findOne({ name: decodeURI(req.params.projectname) }, (err, project) => {
-      if (err) { console.error(err); }
-      else if (project == null) { res.render("lost"); }
-      else {
-         letsGo();
-         async function letsGo() {
-            let returnedData = await getNewpageData();
-            returnedData.thisProject = project;
-            res.render("project/control", { user: JSON.stringify(returnedData.user), project: JSON.stringify(project), thisProject: returnedData.thisProject });
-         }
-      }
+      else res.render("lost");
    });
 });
 
 // Temporary landings
 app.get("/sign-out", (req, res) => {
    signedIn = false;
-   user = null;
    signedInUser = "(not signed in)";
    res.redirect("/");
 });
@@ -278,26 +284,10 @@ app.post("/newchat", (req, res) => {
    });
 });
 
-// const newChat = new Chats({
-//    members: [signedInUser.handle],
-//    name: "ChatTest v4 Clearance9",
-//    about: "Test chat - it has a long, hard road ahead.",
-//    id: uuidv4(),
-//    created: Date.now(),
-//    messages: [],
-//    settings: { type: "public edit" },
-// });
-// newChat.save(function (err) {
-//    if (err) return console.error(err);
-//    else { res.send("Success!"); }
-// });
-
-
 /* =============
 // Mail
 ============= */
 
-// You've got mail. Wait a second, ok now you do.
 const transporter = nodemailer.createTransport({
    service: "gmail",
    auth: {
@@ -319,18 +309,13 @@ function sendEmail(title, text, recipient) {
    });
 }
 
-// sendEmail("hey there", "hi", "editorrust@gmail.com"); // Ack private email alert! Whatever. Let me get back to listening to my 10 hour fan sounds (https://www.youtube.com/watch?v=C5Gm8UvxKlU)
-
 /* =============
 // Important stuff
 ============= */
 
 // Get all lost requests
-app.get("*", (req, res) => {
-   res.send("lost!");
-});
-
-app.listen(port);
+app.get("*", (req, res) => { res.render("lost"); });
+server.listen(port);
 
 // Auto sign in me
 Users.findOne({ name: "Editor Rust" }, (err, user) => { signIn(user); });
