@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+   <meta name="viewport" content="width=device-width">
+   <meta name="theme-color" content="#51FC95">
    <link rel="stylesheet" href="styles/tailwind.css">
    <link rel="stylesheet" href="styles/main.css">
    <title>Chat Ex</title>
 </head>
 <body>
    <%- include("partials/panel") %>
-   <div>
+   <div class="h-[100vh] overflow-auto">
       <h3 class="m-2 mx-4 text-3xl">Check out some public chats</h3>
       <% chats.forEach(function(chat) { %>
          <% if (chat.settings.type == "public edit") { %>
@@ -17,7 +19,7 @@
                <p class="text-gray-600">Members <%= JSON.stringify(chat.members) %></p>
                <p class="text-gray-600">Id <%= chat.id %></p>
                <p class="text-gray-600">Created <%= new Date(chat.created).toLocaleString() %></p>
-               <p class="text-gray-600">Messages <%= JSON.stringify(chat.messages) %></p>
+               <!-- <p class="text-gray-600">Messages <%= JSON.stringify(chat.messages) %></p> -->
                <p class="text-gray-600">Settings <%= JSON.stringify(chat.settings) %></p>
             </div>
          <% } %>

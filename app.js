@@ -26,7 +26,7 @@ app.set("view engine", "ejs");
 
 // Mongoose things
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.MONGODB_URI, { useUnifiedTopology: true, useNewUrlParser: true });
+mongoose.connect("mongodb+srv://EditorSquirrel:SBtBYDnD2rvmsUjz@testcluster.ky80id3.mongodb.net/?retryWrites=true&w=majority", { useUnifiedTopology: true, useNewUrlParser: true });
 connection.on("error", console.error.bind(console, "Connection error: "));
 
 // Schemas

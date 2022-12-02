@@ -1,15 +1,16 @@
-<div class="border-r-2 border-gray-100">
+<div class="border-r-2 h-[100vh] border-gray-100">
    <div class="sticky top-0 left-0 right-0 py-6 px-4 mb-2 border-b-2 border-gray-100">
-      <h2 class="text-3xl">Chat Ex</h2>
+      <h2 class="text-3xl bg-white">Chat Ex</h2>
    </div>
 
-   <p>Chats you are in</p>
+   <p class="m-2 text-lg text-gray-500 font-bold">Chats you are in</p>
    <% user.chats.forEach(function(chat) { %>
-      
-      <div class="m-4 py-4 px-6 bg-gray-50 rounded-lg">
-         <h2 class="text-xl"><%= chats.find(x => x.id == chat).name %></h2>
-         <p class="text-gray-600"><%= chats.find(x => x.id == chat).about %></p>
-         <p class="text-md"><%= chats.find(x => x.id == chat).members.length %> member(s)</p>
-      </div>
+      <a href="/<%= chat %>">
+         <div class="py-3 px-4 my-2 border-t-2 first:border-t-0 border-gray-100">
+            <h2 class="text-xl"><%= chats.find(x => x.id == chat).name %></h2>
+            <p class="text-gray-600"><%= chats.find(x => x.id == chat).about %></p>
+            <p class="text-md"><%= chats.find(x => x.id == chat).members.length %> member(s)</p>
+         </div>
+      </a>
    <% }); %>
 </div>

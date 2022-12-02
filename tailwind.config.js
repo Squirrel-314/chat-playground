@@ -16,6 +16,7 @@ module.exports = {
         thormsgbg: "#FFFCF4",
         yourmsgbgdrk: "#004328",
         thormsgbgdrk: "#523C00",
+        theme: "var(--theme)"
       }
      },
    },

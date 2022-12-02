@@ -8,9 +8,8 @@ socket.on("join", (room) => {
 
 socket.on("recieve", (message) => {
    let msg = document.createElement("DIV");
-   console.log(message)
    msg.innerHTML = `
-      <div class="py-2 px-4 my-2 border-b-2 border-gray-100">
+      <div class="py-2 px-4 my-2 border-b-2 last:border-b-0 border-gray-100">
          <p class="text-lg">${message.msg}</p>
          <p>Posted by ${message.user}</p>
          <p class="text-gray-700">On ${new Date(message.date).toLocaleString()}</p>
