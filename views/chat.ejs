@@ -8,17 +8,17 @@
    <script src="socket.io/socket.io.js"></script>
    <title><%= chat.name %> | Chat Ex</title>
 </head>
-<body>
+<body class="Ok">
    <%- include("partials/panel") %>
    <div class="h-[100vh] overflow-auto">
       <% if (chat.settings.type == "public edit" || chat.settings.type == "public view" || chat.members.includes(user.username)) { %>
          <!-- can view - show option to send invite request -->
          <div class="sticky top-0 left-0 right-0 py-2 bg-white border-b-2 border-gray-100">
-            <h3 class="m-2 mx-4 text-3xl"><%= chat.name %></h3>
+            <h3 class="m-2 mx-4 text-3xl"><%= chat.name %><span class="activeUsers float-right text-gray-600"></span></span></h3>
          </div>
          <div class="messageBox py-4 px-2">
             <% chat.messages.forEach(function(msg) { %>
-               <div class="py-2 px-4 my-2 border-b-2 last:border-b-0 border-gray-100">
+               <div class="py-2 px-4 my-2 border-t-2 first:border-t-0 border-gray-100">
                   <p class="text-lg"><%= msg.msg %></p>
                   <p>Posted by <%= users.find(x => x.id == msg.user).username %></p>
                   <p class="text-gray-700">On <%= new Date(msg.date).toLocaleString() %></p>
@@ -28,7 +28,7 @@
          <% if (chat.settings.type == "public edit" || chat.members.includes(user.username)) { %>
             <form action="javascript:post()" class="p-2 grid bg-white border-t-2 border-gray-100" style="grid-template-columns: auto 7rem">
                <input class="py-0.5 px-3 text-lg focus:ring-2 ring-theme focus:outline-0 border-2 border-gray-100 rounded-l-full" id="newMSg" type="text">
-               <button class="bg-gray-200 rounded-r-full" type="submit">Send!</button>
+               <button class="bg-gray-100 rounded-r-full" type="submit">Send!</button>
             </form>
          <% } %>
       <% } else { %>
@@ -42,6 +42,21 @@
    username = <%- JSON.stringify(user.username) %>;
    usercode = <%- JSON.stringify(user._id) %>;
    chatId = <%- JSON.stringify(chat.id) %>;
+</script>
+<script type="text/javascript">
+   localStorage.openpages = Date.now();
+   const onLocalStorageEvent = function(e) {
+      if (e.key == "openpages") { localStorage.page_available = Date.now(); }
+      if (e.key == "page_available") {
+         document.body.innerHTML = "";
+         let toobad = document.createElement("P");
+         toobad.textContent = "You're already in another tab";
+         document.body.appendChild(toobad);
+         document.body.classList.remove("Ok");
+
+      }
+   };
+   window.addEventListener("storage", onLocalStorageEvent, false);
 </script>
 <script src="scripts/chat.js"></script>
 </html>

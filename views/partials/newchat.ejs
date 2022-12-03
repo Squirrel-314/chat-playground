@@ -1,0 +1,55 @@
+<!-- Create New Project -->
+<div class="newchatPanel p-8 fixed left-0 backdrop-blur-sm z-[100]" style="height: 100vh; width: 100vw; transition: .12s; top: -100%; transform: scale(.5) rotateX(90deg);">
+   <div class="relative p-8 h-full w-full overflow-auto bg-white dark:bg-gray-900 rounded-xl shadow-sm shadow-gray-200 dark:shadow-gray-800">
+      <p class="newchat-text mb-6 text-2xl text-center">Let's make a new project!</p>
+      <form action="/newchat" method="POST" id="newchat">
+         <div>
+            <div class="mb-4">
+               <p class="m-2 mt-4 text-xl">Chat name (Required)</p>
+               <input class="py-2 px-3 focus:outline-none focus:ring-2 focus:bg-white focus:ring-theme transition border-2 border-gray-100 rounded-xl w-full" type="text" name="name" placeholder=" The name of your new chat" required>
+               <br>
+               <p class="m-2 mt-4 text-xl">About chat</p>
+               <textarea class="py-2 px-3 focus:outline-none focus:ring-2 focus:bg-white focus:ring-theme transition border-2 border-gray-100 rounded-xl w-full" type="text" name="about" placeholder="A little bit about the topic"></textarea>   
+            </div>
+            <fieldset class="py-4 px-6 border-2 border-gray-100 rounded-xl">
+               <legend class="px-2">Choose chat visibility</legend>
+               <div>
+                 <input type="radio" id="PuVi" name="type" value="public view" checked>
+                 <label for="PuVi">Public view</label>
+               </div>
+               <div>
+                 <input type="radio" id="PuEd" name="type" value="public edit">
+                 <label for="PuEd">Public edit</label>
+               </div>
+               <div>
+                 <input type="radio" id="PrVi" name="type" value="private view">
+                 <label for="PrVi">Private view</label>
+               </div>
+               <div>
+                  <input type="radio" id="PrEd" name="type" value="private edit">
+                  <label for="PrEd">Private edit</label>
+                </div> 
+            </fieldset>
+         </div>
+         <button onclick="hide('newchatPanel')"  class="bg-theme px-5 py-3 text-white text-lg font-nunito font-semibold rounded-xl absolute bottom-4 right-4" type="submit">Leeeeeeeet's GO!</button>
+      </form>
+      <button onclick="hide('newchatPanel')" class="p-2 px-6 bg-gray-50 dark:bg-gray-800 rounded-md absolute bottom-4 left-4">Close</button>
+   </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+function show(input) { document.querySelector("." + input).style.top = "0%"; document.querySelector("." + input).style.transform = "scale(1) rotateX(0)"; }
+function hide(input) { document.querySelector("." + input).style.top = "-100%"; document.querySelector("." + input).style.transform = "scale(.5) rotateX(90deg)"; }
+$("#newchat").submit(function(event) {
+   event.preventDefault();
+   $.post("/newchat", {
+      name: this.name.value,
+      about: this.about.value,
+      date: new Date(),
+      settings: { type: this.type.value }
+   }).done(function(data) {
+      document.querySelector(".newchat-text").textContent = data;
+      if (data == "Success!") { console.log("Chat created!"); location.reload(); }
+   });
+});
+</script>

@@ -2,14 +2,23 @@ let socket = io();
 let msgBox = document.querySelector(".messageBox");
 let messageInput = document.getElementById("newMSg");
 
-socket.on("join", (room) => {
-   console.log("Joined");
+socket.on("no-entry", () => {
+   console.log("Not allowed in");
+});
+
+socket.on("join", ({ room, users }) => {
+   console.log("Joined " + room);
+   document.querySelector(".activeUsers").textContent = `${users.length} active`;
+});
+
+socket.on("left", ({ users }) => {
+   document.querySelector(".activeUsers").textContent = `${users.length} active`;
 });
 
 socket.on("recieve", (message) => {
    let msg = document.createElement("DIV");
    msg.innerHTML = `
-      <div class="py-2 px-4 my-2 border-b-2 last:border-b-0 border-gray-100">
+      <div class="py-2 px-4 my-2 border-t-2 border-gray-100">
          <p class="text-lg">${message.msg}</p>
          <p>Posted by ${message.user}</p>
          <p class="text-gray-700">On ${new Date(message.date).toLocaleString()}</p>
@@ -17,8 +26,6 @@ socket.on("recieve", (message) => {
    msgBox.appendChild(msg);
    scrollToLast();
 });
-
-socket.emit("join", chatId, username);
 
 function post() {
    if (messageInput.value != "") {
@@ -35,3 +42,5 @@ scrollToLast();
 function scrollToLast() {
    msgBox.scrollIntoView({ behavior: "smooth", block: "end" });
 }
+
+setTimeout(() => { if (document.body.classList.contains("Ok")) { socket.emit("join", chatId, username); } }, 300);

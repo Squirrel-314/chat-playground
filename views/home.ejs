@@ -23,6 +23,17 @@
                <p class="text-gray-600">Settings <%= JSON.stringify(chat.settings) %></p>
             </div>
          <% } %>
+         <% if (chat.settings.type == "public view") { %>
+            <div class="m-4 py-4 px-6 bg-gray-100 rounded-lg">
+               <h2 class="text-2xl"><%= chat.name %></h2>
+               <h3 class="text-lg text-gray-800"><%= chat.about %></h3>
+               <p class="text-gray-600">Members <%= JSON.stringify(chat.members) %></p>
+               <p class="text-gray-600">Id <%= chat.id %></p>
+               <p class="text-gray-600">Created <%= new Date(chat.created).toLocaleString() %></p>
+               <!-- <p class="text-gray-600">Messages <%= JSON.stringify(chat.messages) %></p> -->
+               <p class="text-gray-600">Settings <%= JSON.stringify(chat.settings) %></p>
+            </div>
+         <% } %>
       <% }); %>
    </div>
 </body>

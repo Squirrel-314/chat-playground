@@ -26,7 +26,7 @@ app.set("view engine", "ejs");
 
 // Mongoose things
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb+srv://EditorSquirrel:SBtBYDnD2rvmsUjz@testcluster.ky80id3.mongodb.net/?retryWrites=true&w=majority", { useUnifiedTopology: true, useNewUrlParser: true });
+mongoose.connect(process.env.MONGODB_URI, { useUnifiedTopology: true, useNewUrlParser: true });
 connection.on("error", console.error.bind(console, "Connection error: "));
 
 // Schemas
@@ -91,14 +91,12 @@ function getNewpageData() {
 }
 
 /* =============
-// Get requests
+// Socket
 ============= */
-
 
 const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const e = require("express");
 const io = new Server(server);
 const rooms = [], usernames = [];
 
@@ -107,9 +105,11 @@ io.on("connection", (socket) => {
    socket.on("join", (room, username) => {
       rooms[socket.id] = room;
       usernames[socket.id] = username;
+      socket.username = username;
       socket.leaveAll();
       socket.join(room);
-      socket.emit("join", room);
+      const sockets = Array.from(io.sockets.sockets).map(socket => socket[0]);
+      io.in(rooms[socket.id]).emit("join", { room: room, users: sockets });   
    });
 
    socket.on("send", (message) => {
@@ -123,6 +123,11 @@ io.on("connection", (socket) => {
          }
       });
    });
+
+   socket.on("disconnect", () => {
+      const sockets = Array.from(io.sockets.sockets).map(socket => socket[0]);
+      io.in(rooms[socket.id]).emit("left", { users: sockets });
+   });
 });
 
 
@@ -132,23 +137,9 @@ function saveMsg(chat, msgData) {
    }, (err) => { if (err) console.log(err); });
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* =============
+// Get requests
+============= */
 
 app.get("/", (req, res) => { goSomewhere(res, "home"); });
 
@@ -260,14 +251,15 @@ let bcryptForMe = (pass) => {
 ============= */
 
 app.post("/newchat", (req, res) => {
+   let chatid = uuidv4();
    const newChat = new Chats({
       members: [signedInUser.username],
       name: req.body.name,
       about: req.body.about,
-      id: uuidv4(),
+      id: chatid,
       created: req.body.date,
       messages: [],
-      settings: req.body.settings,
+      settings: req.body.settings
       /*
       type:
       public edit - anyone can view and edit
@@ -278,10 +270,13 @@ app.post("/newchat", (req, res) => {
       allow anonymous on chats - option
       */
    });
-   newChat.save(function (err) {
+   newChat.save(function (err, chat) {
       if (err) return console.error(err);
       else { res.send("Success!"); }
    });
+   Users.findByIdAndUpdate(signedInUser.id, {
+      $push: { chats: chatid }
+   }, (err) => { if (err) console.log(err); } );
 });
 
 /* =============
