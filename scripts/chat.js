@@ -21,7 +21,7 @@ socket.on("recieve", (message) => {
       <div class="py-2 px-4 my-2 border-t-2 border-gray-100">
          <p class="text-lg">${message.msg}</p>
          <p>Posted by ${message.user}</p>
-         <p class="text-gray-700">On ${new Date(message.date).toLocaleString()}</p>
+         <p class="text-gray-700">On ${new Date(message.date).toLocaleString()} ${dateDiff(msg.date)}</p>
       </div>`;
    msgBox.appendChild(msg);
    scrollToLast();

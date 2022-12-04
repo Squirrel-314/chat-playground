@@ -1,6 +1,6 @@
 {
   "name": "chat-experiments",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A test area for my chat experiments",
   "main": "app.js",
   "scripts": {

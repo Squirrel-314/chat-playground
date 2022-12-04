@@ -13,25 +13,21 @@
       <h3 class="m-2 mx-4 text-3xl">Check out some public chats</h3>
       <% chats.forEach(function(chat) { %>
          <% if (chat.settings.type == "public edit") { %>
-            <div class="m-4 py-4 px-6 bg-gray-50 rounded-lg">
+            <div class="mx-4 my-6 px-6 relative border-l-4 border-theme rounded">
+               <span class="py-2 px-4 absolute top-1 right-1 inline-block bg-emerald-200 da rounded-2xl">Public edit</span>
                <h2 class="text-2xl"><%= chat.name %></h2>
                <h3 class="text-lg text-gray-800"><%= chat.about %></h3>
                <p class="text-gray-600">Members <%= JSON.stringify(chat.members) %></p>
                <p class="text-gray-600">Id <%= chat.id %></p>
-               <p class="text-gray-600">Created <%= new Date(chat.created).toLocaleString() %></p>
-               <!-- <p class="text-gray-600">Messages <%= JSON.stringify(chat.messages) %></p> -->
-               <p class="text-gray-600">Settings <%= JSON.stringify(chat.settings) %></p>
             </div>
          <% } %>
          <% if (chat.settings.type == "public view") { %>
-            <div class="m-4 py-4 px-6 bg-gray-100 rounded-lg">
+            <div class="mx-4 my-6 px-6 relative border-l-4 border-gray-300 rounded">
+               <span class="py-2 px-4 absolute top-1 right-1 inline-block bg-gray-200 rounded-2xl">Public view</span>
                <h2 class="text-2xl"><%= chat.name %></h2>
                <h3 class="text-lg text-gray-800"><%= chat.about %></h3>
                <p class="text-gray-600">Members <%= JSON.stringify(chat.members) %></p>
                <p class="text-gray-600">Id <%= chat.id %></p>
-               <p class="text-gray-600">Created <%= new Date(chat.created).toLocaleString() %></p>
-               <!-- <p class="text-gray-600">Messages <%= JSON.stringify(chat.messages) %></p> -->
-               <p class="text-gray-600">Settings <%= JSON.stringify(chat.settings) %></p>
             </div>
          <% } %>
       <% }); %>

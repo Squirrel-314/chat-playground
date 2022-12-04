@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta name="viewport" content="width=device-width">
+   <meta name="theme-color" content="#51FC95">
+   <link rel="stylesheet" href="/styles/tailwind.css">
+   <link rel="stylesheet" href="/styles/main.css">
+   <title>User <%= theuser.username %> | Chat Ex</title>
+</head>
+<body>
+   <%- include("partials/panel") %>
+   <div class="p-4 h-[100vh] overflow-auto">
+      <h1 class="text-3xl"><%= theuser.username %></h1>
+      <p class="text-xl text-gray-600"><%= theuser.email %></p>
+      <p class="p-2 text-xl"><%= theuser.bio %></p>
+      <div>
+         <fieldset class="mx-2 my-4 py-2 pb-4 px-6 border-2 border-gray-100 rounded-xl">
+            <legend class="px-2">Saved links</legend>
+            <% theuser.links.forEach((link) => { %>
+               <a href="<%= link %>" class="underline decoration-theme"><%= link %></a>
+            <% }); %>
+         </fieldset>
+         <% theuser.chats.forEach(function(chat) { %>
+            <% if (chats.find(x => x.id == chat).type == "public edit" || chats.find(x => x.id == chat).type == "public view" || chats.find(x => x.id == chat).members.includes(user.username)) { %>
+               <div class="relative urrm py-2 px-4 my-1 mx-2 border-b-2 border-gray-100">
+                  <h2 class="text-xl"><%= chats.find(x => x.id == chat).name %></h2>
+                  <p class="text-gray-600"><%= chats.find(x => x.id == chat).about %></p>
+               </div>
+            <% } %>
+         <% }); %>
+         <style>
+            .urrm h2::before {
+               content: "";
+               position: absolute;
+               top: .7rem;
+               left: -.3rem;
+               height: 3rem;
+               width: .25rem;
+               border-radius: 5rem;
+               background-color: var(--theme);
+               transition: .2s;
+            }
+         </style>
+      </div>
+      <p class="my-4 text-gray-500 text-center">Database id - <%= theuser._id %></p>
+   </div>
+</body>
+<%- include("partials/menu") %>
+</html>

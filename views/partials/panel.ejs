@@ -1,8 +1,8 @@
-<div class="border-r-2 h-[100vh] border-gray-100">
-   <div class="sticky top-0 left-0 right-0 py-6 px-4 mb-2 border-b-2 border-gray-100">
-      <h2 class="text-3xl bg-white">Chat Ex</h2>
+<div class="panel border-r-2 h-[100vh] overflow-auto border-gray-100">
+   <div class="sticky top-0 left-0 right-0 py-6 px-4 mb-2 border-b-2 border-gray-100 bg-white">
+      <h2 class="text-3xl">Chat Ex</h2>
    </div>
-   <p class="m-2 text-lg text-gray-500 font-bold">Chats you are in</p>
+   <p class="m-2 text-lg text-gray-500 font-semibold text-center">Chats you are in</p>
    <% user.chats.forEach(function(chat) { %>
       <a href="/<%= chat %>">
          <div class="yourchats-listitem py-3 px-4 my-2 mx-2 border-t-2 border-gray-100">

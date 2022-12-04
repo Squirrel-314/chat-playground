@@ -6,6 +6,7 @@
    <link rel="stylesheet" href="styles/tailwind.css">
    <link rel="stylesheet" href="styles/main.css">
    <script src="socket.io/socket.io.js"></script>
+   <script src="scripts/digit-tweaked.js"></script>
    <title><%= chat.name %> | Chat Ex</title>
 </head>
 <body class="Ok">
@@ -17,11 +18,37 @@
             <h3 class="m-2 mx-4 text-3xl"><%= chat.name %><span class="activeUsers float-right text-gray-600"></span></span></h3>
          </div>
          <div class="messageBox py-4 px-2">
+            <%
+            function dateDiff(dateString) {
+               let then = new Date(dateString);
+               let now = new Date();
+               let diffMs = (now - then);
+               let diffDays = Math.floor(diffMs / 86400000);
+               let diffHrs = Math.floor((diffMs % 86400000) / 3600000);
+               let diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+               let months = Math.round(diffDays / 30);
+               let years = Math.round(months / 12);
+
+               if (diffDays == 0) {
+                  if (diffHrs == 0) { return `(${diffMins} minutes ago)`; }
+                  else { return `(${diffHrs} hours ago)`; }
+               }
+               else if (diffDays < 31) { return `(${diffDays} days ago)`; }
+               else if (months < 12) {
+                  if (months == 1) return `(about 1 month ago)`;
+                  return `(about ${months} months ago)`;
+               }
+               else {
+                  if (years == 1) return `(about 1 year ago)`;
+                  return `(about ${years} years ago)`;
+               }
+            }
+            %>
             <% chat.messages.forEach(function(msg) { %>
                <div class="py-2 px-4 my-2 border-t-2 first:border-t-0 border-gray-100">
                   <p class="text-lg"><%= msg.msg %></p>
                   <p>Posted by <%= users.find(x => x.id == msg.user).username %></p>
-                  <p class="text-gray-700">On <%= new Date(msg.date).toLocaleString() %></p>
+                  <p class="text-gray-700">On <%= new Date(msg.date).toLocaleString() %> <%= dateDiff(msg.date) %></p>
                </div>
             <% }); %>
          </div>

@@ -153,7 +153,21 @@ app.get("/:chatid", (req, res) => {
             returnedData.chat = chat;
             res.render("chat", returnedData);
          }
-         
+      }
+      else res.render("lost");
+   });
+});
+
+app.get("/user/:userid", (req, res) => {
+   Users.findById(req.params.userid, (err, user) => {
+      if (err) console.error(err);
+      else if (user) {
+         awaitData();
+         async function awaitData() {
+            let returnedData = await getNewpageData();
+            returnedData.theuser = user;
+            res.render("user", returnedData);
+         }
       }
       else res.render("lost");
    });

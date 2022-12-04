@@ -3,5 +3,9 @@
 @tailwind utilities;
 
 :root {
-   --theme: #51FC95;
+   --theme: #FC63CE;
+   /* New theme every version */
+   /* Init: #51FC95 */
+   /* v0.1.1: #FC63CE */
+   /* v0.1.1: User pages, UI changes, Message Since */
 }

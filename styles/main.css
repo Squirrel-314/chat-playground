@@ -23,3 +23,7 @@ body {
 .menuhov:hover .menu {
    margin-left: -3.5rem;
 }
+
+.panel::-webkit-scrollbar {
+   display: none;
+}
